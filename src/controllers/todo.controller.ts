@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import z from "zod";
 import { PrismaClient } from "@prisma/client";
 import { apiError } from "../utils/apiError";
+import { json } from "stream/consumers";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,21 @@ const insertBodyTypes = z.object({
 });
 
 const userIdType = z.object({ userId: z.number() });
+
+const updateDoneBodyType = z.object({
+    id: z.number(),
+    done: z.boolean(),
+});
+
+const updateTitleBodyType = z.object({
+    id: z.number(),
+    title: z.string(),
+});
+
+const updateDiscriptionBodyType = z.object({
+    id: z.number(),
+    description: z.string(),
+});
 
 // operations needed to be covered in todo
 // insert todo
@@ -81,6 +97,81 @@ export const getTodoByUserId = asyncHandler(async (req, res) => {
     }
 
     console.log("res data is: " + JSON.stringify(resdata));
+
+    res.send(resdata);
+});
+
+export const updateDone = asyncHandler(async (req, res) => {
+    console.log("inside updateDone");
+
+    const zRes = updateDoneBodyType.safeParse(req.body);
+
+    if (!zRes.success) {
+        throw new apiError("please check request body", 400);
+    }
+
+    const resdata = await prisma.todo.update({
+        where: {
+            id: zRes.data.id,
+        },
+        data: {
+            done: zRes.data.done,
+        },
+    });
+
+    if (!resdata) {
+        throw new apiError("error with prisma write", 400);
+    }
+
+    res.send(resdata);
+});
+
+export const updateTitle = asyncHandler(async (req, res) => {
+    console.log("inside updateTitle");
+
+    const zRes = updateTitleBodyType.safeParse(req.body);
+
+    if (!zRes.success) {
+        throw new apiError("please check request body", 400);
+    }
+
+    const resdata = await prisma.todo.update({
+        where: {
+            id: zRes.data.id,
+        },
+        data: {
+            title: zRes.data.title,
+        },
+    });
+
+    if (!resdata) {
+        throw new apiError("error with prisma write", 400);
+    }
+
+    res.send(resdata);
+});
+
+export const updateDiscription = asyncHandler(async (req, res) => {
+    console.log("inside updateDiscription body: " + JSON.stringify(req.body));
+
+    const zRes = updateDiscriptionBodyType.safeParse(req.body);
+
+    if (!zRes.success) {
+        throw new apiError("please check request body", 400);
+    }
+
+    const resdata = await prisma.todo.update({
+        where: {
+            id: zRes.data.id,
+        },
+        data: {
+            description: zRes.data.description,
+        },
+    });
+
+    if (!resdata) {
+        throw new apiError("error with prisma write", 400);
+    }
 
     res.send(resdata);
 });

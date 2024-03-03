@@ -6,4 +6,7 @@ const routes = (0, express_1.Router)();
 routes.route("/insert").post(todo_controller_1.insertTodo);
 routes.route("/getall").get(todo_controller_1.getallTodos);
 routes.route("/todoid").get(todo_controller_1.getTodoByUserId);
+routes.route("/updateDone").post(todo_controller_1.updateDone);
+routes.route("/updatetitle").post(todo_controller_1.updateTitle);
+routes.route("/updatediscription").post(todo_controller_1.updateDiscription);
 exports.default = routes;
